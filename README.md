@@ -1,30 +1,73 @@
-# codedeploy-to-ec2-nodejs
-Deploy the Nodejs application to EC2 Instance using CodeDeploy
+
+# Flask Container
+
+Below steps needs to be performed to containerize and run the flask application.
+
+
+## Project Setup
+
+Please download the application from this repository
+
+
+
+## Manual steps for Ubuntu container
+
+```javascript
+docker run -dit -p 5000:5000 --name ubuntu ubuntu
 ```
-1. launch Ubuntu instance with User-Data:-
+```javascript
+docker exec -it CONTAINER_ID /bin/bash
+```
+```javascript
+mkdir app
+```
 
-Production 1 , Production 2 , Production 3
+```javascript
+apt-get -y update
+```
+```javascript
+apt-get install -y python3-pip python3-dev
+```
+```javascript
+cd /usr/local/bin
+```
+```javascript
+ln -s /usr/bin/python3 python
+```
+```javascript
+pip3 --no-cache-dir install --upgrade pip
+```
+```javascript
+apt-get install -y vim
+```
+```javascript
+rm -rf /var/lib/apt/lists/*
+```
+```javascript
+pip3 install flask
+```
+Exit from container to copy the application into container
+```javascript
+docker cp LOCAL_PATH CONTAINER_ID:/LOCATION
+```
+```javascript
+FLASK_APP=/app/app.py flask run --host=0.0.0.0
+```
 
-2. Create IAM roles for both CodeDeploy and EC2 instance:-
-We are going to create a Role for EC2 with this name "ec2_to_codedeploy"
+# Dockerfile
 
-AWSCodeDeployFullAccess
-AmazonS3FullAccess
-AdministratorAccess
-
-We are going to create a Role for CodeDeploy with this name "codedeploy_to ec2"
-
-AWSCodeDeployRole
-
-and then attache this role "ec2_to_codedeploy" to instance Production 1 , Production 2 , Production 3
-
-3. Create Application in CodeDeploy:-
-
-4. Create Deployment group in Application:-
-
-and then attache this role "codedeploy_to ec2" in Deployment group
-
-5. Create CodePipeline using GitHub & CodeDeploy:-
-
-6. Modify the Code & Check if Pipeline works:-
+```javascript
+FROM ubuntu
+WORKDIR /app
+RUN apt-get update
+RUN apt-get install -y python3-pip python3-dev
+RUN cd /usr/local/bin
+RUN ln -s /usr/bin/python3 python
+RUN pip3 --no-cache-dir install --upgrade pip
+RUN apt-get install -y vim
+RUN rm -rf /var/lib/apt/lists/*
+RUN pip3 install flask
+COPY . .
+EXPOSE 5000
+ENTRYPOINT FLASK_APP=/app/app.py flask run --host=0.0.0.0
 ```
